@@ -32,6 +32,7 @@ async def on_ready():
     print(e)
 
 @bot.event
+@bot.event
 async def on_message(message):
   if message.author == bot.user:
         return
@@ -41,10 +42,10 @@ async def on_message(message):
           a = message.content.replace(bot.user.mention, '').strip()
           if a.startswith("!pip_install"):
              try:
-                await pip.main(['install',a.replace("!pip_install",'').strip()])
+                pip.main(['install',a.replace("!pip_install",'').strip()])
                 await message.channel.send(f"Package {a.replace('!pip_install','').strip()} is successfully installed {message.author.mention}")
              except Exception as e:
-                await message.channel.send(f"Error PIP :\n```\n{e}\n```\n {message.author.mention}")
+                await message.channel.send(f"Error PIP :\n```\n{str(e)}\n```\n {message.author.mention}")
           else:
              
              old_stdout = sys.stdout
@@ -53,7 +54,12 @@ async def on_message(message):
              exec(a)
              output = new_stdout.getvalue()
              sys.stdout = old_stdout
-             await message.channel.send(f"Output :\n```\n{output}\n```\n {message.author.mention}")
+             if len(str(output)) > 4000:
+            
+                parts = [str(output)[i:i + 4000] for i in range(0, len(str(output)), 4000)]
+                for part in parts:
+                   await message.channel.send(f"Output :\n```\n{str(part)}\n```\n {message.author.mention}")
+             else:
+                await message.channel.send(f"Output :\n```\n{str(output)}\n```\n {message.author.mention}")
 
 bot.run(token)
-
